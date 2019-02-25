@@ -1,0 +1,72 @@
+~version: "2.0"
+
+
+?path: /.+
+!path_not: /(page|tag)/.+
+
+
+main:          //*[@id="content"]
+title:    $main//*[has-class("entry-title")]
+$body:    $main//*[has-class("entry-content")]
+$lead:    $body/p
+
+
+# date
+@datetime:      //time/@datetime
+published_date: $@
+
+
+# remove href in title
+<span>:          $title//a
+
+
+# related articles, clean footer
+$social:             $body//*[has-class("socials")]
+@before_el($social): $body//*[has-class("yarpp-related")]
+<related>:           $@
+
+@remove:             $body//related//img
+@remove:             $social/following-sibling::*
+@remove:             $social
+
+
+# images
+<pic>:                     //img[has-class("wp-smiley")]
+
+
+@set_attr(href, ./../@href): $body//a/img
+@set_attr(src, @href):       $body//img[ends-with(@href, "jpg")]
+@set_attr(src, @href):       $body//img[ends-with(@href, "jepg")]
+@set_attr(src, @href):       $body//img[ends-with(@href, "png")]
+@set_attr(href, " "):        $body//img[@src = @href]
+@set_attr(src, @src-full):   $body//img[@src-full]
+@before_el(./..):            $body//a/img
+
+
+
+# text stylings
+<blockquote>: $body//*[has-class("quote")]
+
+@set_attr(data-language, ./code/@class): $body//pre[./code]
+
+@after_el(./..): $body//p/img  # most of the time img is last in p
+
+<p>: $body//p/br/next-sibling::br
+
+
+@unsupported: $body//form
+
+
+
+
+
+
+# strange issue with p and img inside (there is no p anywhere)
+# https://ivangrigoryev.com/en/lamb-saagwala/
+
+
+
+
+
+
+
